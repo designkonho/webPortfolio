@@ -1,658 +1,1213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>강건호 디지털 디자인 전시회</title>
-  
-  <style>
-    /* 기본 초기화 */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>강건호 디지털 디자인 전시회</title>
 
-    html, body {
-      width: 100%;
-      background-color: #0a0a0a;
-      color: #ffffff;
-      font-family: sans-serif;
-    }
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    body {
-      overflow: hidden; /* 게이트 통과 전 잠금 */
-    }
+      html,
+      body {
+        width: 100%;
+        background-color: #0a0a0a;
+        color: #ffffff;
+        font-family: sans-serif;
+      }
 
-    /* 상단 고정 헤더 영역 */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 40px;
-      background-color: #ffffff;
-      height: 10vh;
-      color: #111;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 100;
-      border-bottom: 1px solid #eee;
-    }
-    .logo { font-weight: bold; font-size: 18px; }
-    .nav-links { display: flex; gap: 30px; list-style: none; font-size: 14px; }
+      body {
+        overflow: hidden; 
+      }
 
-    /* ----------------------------------
-       [GATE] 1단계: 전시회 티켓 서명 화면
-    ---------------------------------- */
-    .ticket-gate {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1), opacity 1s;
-    }
-    .ticket-gate.passed {
-      transform: translateY(-100vh);
-      opacity: 0;
-      pointer-events: none;
-    }
-    .ticket {
-      width: 100%;
-      max-width: 450px;
-      background: #ffffff;
-      color: #111111;
-      border-radius: 24px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-      overflow: hidden;
+    
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+        height: 10vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        background-color: rgba(20, 20, 20, 0.4); 
+        backdrop-filter: blur(12px); 
+        -webkit-backdrop-filter: blur(12px); 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+        color: #ffffff; 
+      }
+
+      .logo {
+        font-weight: bold;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 35px; 
+        width: auto;
+        display: block;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 30px;
+        list-style: none;
+        font-size: 14px;
+        height: 100%;
+        align-items: center;
+      }
+      .nav-links li {
+        cursor: pointer;
+        font-weight: 600;
+        transition: color 0.3s;
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+      .nav-links li:hover {
+        color: #adff2f;
+      } 
+
+      .sns-menu .sns-dropdown {
+        position: absolute;
+        top: 70%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(30, 30, 30, 0.7); 
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        padding: 12px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .sns-menu:hover .sns-dropdown {
+        opacity: 1;
+        visibility: visible;
+        top: 100%;
+      }
+      .sns-dropdown a {
+        text-decoration: none;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: bold;
+        white-space: nowrap;
+        transition: color 0.2s;
+      }
+      .sns-dropdown a:hover {
+        color: #adff2f;
+      }
+
+     
+      .intro-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: #0a0a0a;
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition:
+          opacity 1s ease-in-out,
+          visibility 1s;
+      }
+      .intro-text {
+        color: #ffffff;
+        font-size: 1.2rem;
+        letter-spacing: 5px;
+        opacity: 0;
+        text-transform: uppercase;
+        animation: fadeInOut 2.5s ease-in-out forwards;
+      }
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translateY(10px);
+          filter: blur(4px);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0px);
+        }
+        70% {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0px);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-10px);
+          filter: blur(4px);
+        }
+      }
+
+      
+      .ticket-gate {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition:
+          transform 1s cubic-bezier(0.86, 0, 0.07, 1),
+          opacity 1s;
+      }
+      .ticket-gate.passed {
+        transform: translateY(-100vh);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .ticket {
+        width: 100%;
+        max-width: 450px;
+        background: #ffffff;
+        color: #111111;
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        opacity: 0;
+        transform: translateY(50px);
+        transition:
+          opacity 1s cubic-bezier(0.25, 1, 0.5, 1),
+          transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .ticket.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .ticket::before,
+      .ticket::after {
+        content: "";
+        position: absolute;
+        top: 68%;
+        width: 30px;
+        height: 30px;
+        background: #0a0a0a;
+        border-radius: 50%;
+        z-index: 10;
+      }
+      .ticket::before {
+        left: -15px;
+      }
+      .ticket::after {
+        right: -15px;
+      }
+      .ticket-divider {
+        position: absolute;
+        top: 70%;
+        left: 5%;
+        width: 90%;
+        border-top: 2px dashed #e0e0e0;
+        z-index: 5;
+      }
+      .ticket-header {
+        background: #00a105;
+        color: #ffffff;
+        padding: 30px 24px;
+        text-align: center;
+      }
+      .ticket-header span {
+        font-size: 0.8rem;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+      .ticket-header h1 {
+        font-size: 1.8rem;
+        margin-top: 8px;
+        font-weight: 800;
+      }
+      .ticket-body {
+        padding: 30px 24px 20px 24px;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+      }
+      .info-item label {
+        font-size: 0.75rem;
+        color: #888;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .info-item p {
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      .ticket-signature {
+        padding: 30px 24px 30px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .ticket-signature h3 {
+        font-size: 0.9rem;
+        color: #333;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+      }
+      .sig-pad-wrapper {
+        width: 100%;
+        background: #f4f6f9;
+        border-radius: 12px;
+        padding: 8px;
+        border: 1px dashed #ccc;
+      }
+      .signature-pad {
+        background: #ffffff;
+        width: 100%;
+        height: 120px;
+        display: block;
+        cursor: crosshair;
+        border-radius: 8px;
+        touch-action: none;
+      }
+      .sig-buttons {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .btn-clear {
+        background: #e0e0e0;
+        color: #555;
+      }
+      .btn-enter {
+        background: #111111;
+        color: #ffffff;
+      }
+      .btn-enter:hover {
+        background: #27b300;
+      }
+
+     
+      .portfolio-section {
+        margin-top: 10vh; 
+        display: flex;
+        width: 100%;
+        height: 90vh; 
+        background-color: #0a0a0a;
+        overflow: hidden;
+      }
+
+      .piano-item {
+        flex: 1;
+        height: 100%;
+        position: relative;
+        cursor: pointer;
+        transition:
+          flex 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+          filter 0.6s,
+          transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 1.2s;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        background-color: #111;
+        filter: grayscale(40%);
+        opacity: 0;
+      }
+
+      .piano-item:nth-child(1) {
+        transition-delay: 0s, 0s, 0.1s, 0.1s;
+      }
+      .piano-item:nth-child(2) {
+        transition-delay: 0s, 0s, 0.3s, 0.3s;
+      }
+      .piano-item:nth-child(3) {
+        transition-delay: 0s, 0s, 0.5s, 0.5s;
+      }
+
+      .piano-item:nth-child(4) {
+        transition-delay: 0s, 0s, 0.5s, 0.5s;
+      }
+      .piano-item:nth-child(5) {
+        transition-delay: 0s, 0s, 0.3s, 0.3s;
+      }
+      .piano-item:nth-child(6) {
+        transition-delay: 0s, 0s, 0.1s, 0.1s;
+      }
+
+      .piano-item.left-curten {
+        transform: translateX(-120%);
+      }
+      .piano-item.right-curten {
+        transform: translateX(120%);
+      }
+
+      .portfolio-section.animate-in .piano-item {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .piano-item::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 1px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 5;
+      }
+      .portfolio-section:not(.has-active) .piano-item:hover {
+        flex: 2.8;
+        filter: grayscale(0%);
+      }
+
+      .piano-item.active {
+        flex: 35;
+        cursor: default;
+        filter: grayscale(0%);
+        overflow-y: auto;
+      }
+
+      .portfolio-section.has-active .piano-item:not(.active) {
+        flex: 0.05;
+        opacity: 0.15;
+      }
+
+      .piano-cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: 2;
+        transition:
+          transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.5s;
+      }
+      .piano-item.active .piano-cover {
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .piano-item .mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(0, 0, 0, 0.2) 60%,
+          rgba(0, 0, 0, 0.5) 100%
+        );
+      }
+
+      .piano-item .cover-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        z-index: 3;
+        transition: opacity 0.4s ease;
+      }
+      .portfolio-section.has-active .piano-item:not(.active) .cover-content {
+        opacity: 0;
+      }
+      .piano-item.active .cover-content {
+        opacity: 0;
+      }
+
+      .cover-content h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
+      }
+      .cover-content p {
+        font-size: 1rem;
+        color: #ccc;
+      }
+
+      .behance-viewer {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #0b0b0b;
+        padding: 0;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+      }
+      .piano-item.active .behance-viewer {
+        opacity: 1;
+      }
+      .behance-viewer img {
+        width: 100%;
+        max-width: 900px;
+        display: block;
+        height: auto;
+      }
+
+      .global-close-btn {
+        position: fixed;
+        top: 13vh;
+        right: 40px;
+        width: 45px;
+        height: 45px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .global-close-btn:hover {
+        background: #adff2f;
+        color: #111;
+        border-color: #adff2f;
+        transform: scale(1.1) translateY(0);
+      }
+      .global-close-btn.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+     
+      .career-section {
+        width: 100%;
+        background-color: #0d0d0d;
+        position: relative;
+      }
+      .scroll-pin-track {
+        width: 100%;
+        height: 375vh;
+        position: relative;
+      }
+      .scroll-pin-track.large {
+        height: 570vh;
+      }
+      .sticky-container {
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+      .svg-line-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .drawing-path {
+        fill: none;
+        stroke: #adff2f;
+        stroke-width: 4.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .career-wrap {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 50px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .career-node {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 60vh;
+        position: relative;
+        opacity: 0;
+        transform: translateY(60px) scale(0.97);
+        transition:
+          opacity 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+          transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .career-node.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .track-1-node,
+      .track-2-node {
+        justify-content: center;
+      }
+      .track-3-node {
+        flex-direction: column;
+        align-items: center;
+        max-width: 750px;
+        margin: 0 auto;
+        gap: 35px;
+        height: auto;
+      }
+
+      .text-phrase {
+        font-size: 5rem;
+        font-weight: 900;
+        letter-spacing: -2px;
+        color: #ffffff;
+        white-space: nowrap;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      }
+      .track-3-node .text-phrase {
+        font-size: 2.8rem;
+        text-align: center;
+        text-shadow: none;
+        z-index: auto;
+      }
+
+      .image-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 700px;
+        height: 450px;
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
+        opacity: 0.25;
+        filter: grayscale(30%) blur(3px);
+        -webkit-mask-image: radial-gradient(
+          ellipse,
+          black 40%,
+          transparent 70%
+        );
+        mask-image: radial-gradient(ellipse, black 40%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .career-box {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 24px;
+        padding: 45px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      .timeline-item {
+        border-left: 3px solid #009135;
+        padding-left: 25px;
+        text-align: left;
+      }
+      .time-period {
+        font-size: 0.85rem;
+        color: #adff2f;
+        font-weight: bold;
+        margin-bottom: 6px;
+      }
+      .job-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+      .job-desc {
+        font-size: 0.95rem;
+        color: #888;
+        line-height: 1.6;
+      }
+    .activity-list {
+      list-style: none;
+      margin-top: 15px;
       display: flex;
       flex-direction: column;
-      position: relative;
+      gap: 10px;
     }
-    .ticket::before, .ticket::after {
-      content: ''; position: absolute; top: 68%; width: 30px; height: 30px; background: #0a0a0a; border-radius: 50%; z-index: 10;
-    }
-    .ticket::before { left: -15px; }
-    .ticket::after { right: -15px; }
-    .ticket-divider {
-      position: absolute; top: 70%; left: 5%; width: 90%; border-top: 2px dashed #e0e0e0; z-index: 5;
-    }
-    .ticket-header { background: #00a105; color: #ffffff; padding: 30px 24px; text-align: center; }
-    .ticket-header span { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8; }
-    .ticket-header h1 { font-size: 1.8rem; margin-top: 8px; font-weight: 800; }
-    .ticket-body { padding: 30px 24px 20px 24px; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-    .info-item label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 4px; }
-    .info-item p { font-weight: bold; font-size: 1rem; }
-    .perf-box { background: #f4f6f9; border-radius: 12px; padding: 15px; }
-    .perf-title { font-size: 0.8rem; color: #666; font-weight: bold; margin-bottom: 10px; }
-    .perf-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; }
-    .perf-val { font-weight: bold; color: #2F00FF; }
-    .ticket-signature { padding: 30px 24px 30px 24px; display: flex; flex-direction: column; align-items: center; }
-    .ticket-signature h3 { font-size: 0.9rem; color: #333; margin-bottom: 12px; letter-spacing: 1px; }
-    .sig-pad-wrapper { width: 100%; background: #f4f6f9; border-radius: 12px; padding: 8px; border: 1px dashed #ccc; }
-    .signature-pad { background: #ffffff; width: 100%; height: 120px; display: block; cursor: crosshair; border-radius: 8px; touch-action: none; }
-    .sig-buttons { display: flex; width: 100%; gap: 10px; margin-top: 15px; }
-    .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-    .btn-clear { background: #e0e0e0; color: #555; }
-    .btn-enter { background: #111111; color: #ffffff; }
-    .btn-enter:hover { background: #2F00FF; }
-
-    /* ----------------------------------
-       [MAIN] 2단계: 피아노 건반 포트폴리오
-    ---------------------------------- */
-    .portfolio-section {
-      margin-top: 10vh;
+    .activity-list li {
       display: flex;
-      width: 100%;
-      height: 90vh;
-      background-color: #0a0a0a;
-      overflow: hidden;
+      align-items: flex-start;
+      gap: 15px;
     }
+    .act-year {
+      color: #ADFF2F; 
+      font-weight: bold;
+      font-size: 0.9rem;
+      min-width: 40px; 
+      padding-top: 2px;
+    }
+    .act-desc {
+      color: #d4d4d4;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="intro-screen" id="introScreen">
+      <div class="intro-text">환영합니다! 티켓을 지급해드릴게요.<br>좋은 관람되세요 :)</div>
+    </div>
 
-    .piano-item {
-      flex: 1;
-      height: 100%;
-      position: relative;
-      cursor: pointer;
-      transition: flex 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s;
-      overflow-x: hidden;
-      overflow-y: hidden; /* 기본값은 숨김, active 시 스크롤 활성화 */
-      background-color: #111;
-      filter: grayscale(40%);
-      opacity: 0;
-    }
-
-    .piano-item.left-curten { transform: translateX(-120%); }
-    .piano-item.right-curten { transform: translateX(120%); }
-
-    .portfolio-section.animate-in .piano-item {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .piano-item::after {
-      content: ''; position: absolute; right: 0; top: 0; width: 1px; height: 100%; background: rgba(255, 255, 255, 0.1);
-      z-index: 5;
-    }
-    .portfolio-section:not(.has-active) .piano-item:hover {
-      flex: 2.8; filter: grayscale(0%);
-    }
-    
-    /* 🛠️ 클릭 확장 상태 (비핸스 스크롤 모드 진입) */
-    .piano-item.active {
-      flex: 35;
-      cursor: default;
-      filter: grayscale(0%);
-      overflow-y: auto; /* 상세 이미지를 위한 자체 세로 스크롤 활성화 */
-    }
-
-    .portfolio-section.has-active .piano-item:not(.active) {
-      flex: 0.05; opacity: 0.15;
-    }
-
-    /* 건반 표지 썸네일 커버 (처음에만 보이고 active 시 서서히 위로 밀림) */
-    .piano-cover {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      z-index: 2;
-      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
-    }
-    .piano-item.active .piano-cover {
-      transform: translateY(-100%); /* 위로 커튼처럼 오픈 */
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .piano-item .mask {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.5) 100%);
-    }
-
-    /* 표지 텍스트 */
-    .piano-item .cover-content {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      color: #fff; text-align: center; white-space: nowrap; z-index: 3;
-      transition: opacity 0.4s ease;
-    }
-    .portfolio-section.has-active .piano-item:not(.active) .cover-content {
-      opacity: 0; /* 다른 건반 줄어들 때 글자 숨김 */
-    }
-    .piano-item.active .cover-content { opacity: 0; } /* 열리면 표지글씨 숨김 */
-    
-    .cover-content h2 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-    .cover-content p { font-size: 1rem; color: #ccc; }
-
-    /* ----------------------------------
-       🎨 새롭게 추가된 [비핸스 스타일 상세 뷰어]
-    ---------------------------------- */
-    .behance-viewer {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #0b0b0b;
-      padding: 0;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-    }
-    .piano-item.active .behance-viewer {
-      opacity: 1;
-    }
-
-    /* 비핸스식 가득 차는 대형 세로 이미지 스타일 */
-    .behance-viewer img {
-      width: 100%;
-      max-width: 900px; /* 너무 퍼지지 않게 중앙 가이드라인 스펙 적용 */
-      display: block;
-      height: auto;
-    }
-
-    /* 건반 닫기(X) 버튼 */
-    .close-btn {
-      position: fixed;
-      top: 13vh;
-      right: 40px;
-      width: 45px;
-      height: 45px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: white;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      z-index: 10;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-    }
-    .close-btn:hover { background: #009528; transform: scale(1.1); }
-    .piano-item.active .close-btn {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* ----------------------------------
-       [CAREER] 3단계: 초장축 고정식 인터랙티브 드로잉 트랙
-    ---------------------------------- */
-    .career-section {
-      width: 100%;
-      background-color: #0d0d0d;
-      position: relative;
-    }
-
-    .scroll-pin-track {
-      width: 100%;
-      height: 375vh; 
-      position: relative;
-    }
-    
-    .scroll-pin-track.large {
-      height: 570vh; 
-    }
-
-    .sticky-container {
-      position: sticky;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .svg-line-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .drawing-path {
-      fill: none;
-      stroke: #ADFF2F;
-      stroke-width: 4.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .career-wrap {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 50px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .career-node {
-      display: flex;
-      align-items: center;
-      gap: 60px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(60px) scale(0.97); 
-      transition: opacity 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    .career-node.visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-
-    .track-1-node { justify-content: flex-start; }
-    .track-2-node { justify-content: flex-end; flex-direction: row-reverse; }
-    .track-3-node {
-      flex-direction: column;
-      align-items: center;
-      max-width: 750px;
-      margin: 0 auto;
-      gap: 35px;
-    }
-
-    .text-phrase {
-      font-size: 3.8rem;
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      color: #ffffff;
-      white-space: nowrap;
-    }
-    .track-3-node .text-phrase { font-size: 2.8rem; text-align: center; }
-
-    .image-placeholder {
-      width: 260px; height: 260px; background-color: #1a1a1a; border: 1px dashed #333; border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-      background-size: cover; background-position: center; position: relative;
-    }
-    .image-placeholder::before {
-      content: 'IMAGE'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      font-size: 0.8rem; color: #444; font-weight: bold; letter-spacing: 2px;
-    }
-
-    .career-box {
-      width: 100%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 24px; padding: 45px; box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-    }
-    .timeline { display: flex; flex-direction: column; gap: 30px; }
-    .timeline-item { border-left: 3px solid #009135; padding-left: 25px; text-align: left;}
-    .time-period { font-size: 0.85rem; color: #ADFF2F; font-weight: bold; margin-bottom: 6px; }
-    .job-title { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 8px; }
-    .job-desc { font-size: 0.95rem; color: #888; line-height: 1.6; }
-  </style>
-</head>
-<body>
-
-  <div class="ticket-gate" id="ticketGate">
-    <div class="ticket">
-      <div class="ticket-header"><span>Digital Design Exhibition</span><h1>KONHO</h1></div>
-      <div class="ticket-body">
-        <div class="info-grid">
-          <div class="info-item"><label>DATE</label><p>2024 ~ 2026</p></div>
-          <div class="info-item"><label>LOCATION</label><p>SEOUL, KOREA</p></div>
+    <div class="ticket-gate" id="ticketGate">
+      <div class="ticket" id="ticketElement">
+        <div class="ticket-header">
+          <span>Digital Design Exhibition</span>
+          <h1>KONHO</h1>
         </div>
-        
-      </div>
-      <div class="ticket-divider"></div>
-      <div class="ticket-signature">
-        <h3>서명 후 입장해주세요.</h3>
-        <div class="sig-pad-wrapper"><canvas class="signature-pad" id="sigPad"></canvas></div>
-        <div class="sig-buttons">
-          <button class="btn btn-clear" id="clearBtn">다시 쓰기</button>
-          <button class="btn btn-enter" id="enterBtn">티켓 활성화 및 입장</button>
+        <div class="ticket-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>DATE</label>
+              <p>2024 ~ 2026</p>
+            </div>
+            <div class="info-item">
+              <label>LOCATION</label>
+              <p>SEOUL, KOREA</p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <header class="header">
-    <div class="logo">KONHO</div>
-    <ul class="nav-links"><li>작품소개</li><li>SNS</li></ul>
-  </header>
-
-  <main class="portfolio-section" id="portfolioSection">
-    
-    <div class="piano-item left-curten">
-      <div class="piano-cover" style="background-image: url('./img/온결썸.png'); background-color: #222;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>온결고등학교</h2><p>Branding</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/온결고등학교비핸스.png" alt="온결고등학교 이미지">
-        </div>
-    </div>
-
-    <div class="piano-item left-curten">
-      <div class="piano-cover" style="background-image: url('./img/십이점오썸.png'); background-color: #333;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>12.5</h2><p>Branding & Clothing design</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/십이점오비.png" alt="십이점오 이미지">
-      </div>
-    </div>
-
-    <div class="piano-item left-curten">
-      <div class="piano-cover" style="background-image: url('./img/담다썸.png'); background-color: #444;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>담다</h2><p>Branding</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/담다비.png" alt="포스터 디자인">
-      </div>
-    </div>
-
-    <div class="piano-item right-curten">
-      <div class="piano-cover" style="background-image: url('./img/포스터썸.png'); background-color: #111;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>2024 ~ 2025 Poster Design</h2><p>Platform Identity Proposal</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/포스터비.png" alt="컬러 리브랜딩">
-      </div>
-    </div>
-
-    <div class="piano-item right-curten">
-      <div class="piano-cover" style="background-image: url('./img/한지썸.png'); background-color: #252;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>한지</h2><p>Branding & UI/UX Design</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/한지비.png" alt="한지이미지">
-      </div>
-    </div>
-
-    <div class="piano-item right-curten">
-      <div class="piano-cover" style="background-image: url('./img/트라이브썸.png'); background-color: #3e3;">
-        <div class="mask"></div>
-        <div class="cover-content"><h2>Thrive</h2><p>Club Rebranding</p></div>
-      </div>
-      <div class="close-btn">✕</div>
-      <div class="behance-viewer">
-        <img src="./img/트라이브비.png" alt="트라이브 이미지">
-      </div>
-    </div>
-  </main>
-
-  <section class="career-section">
-    <div class="scroll-pin-track" id="track1">
-      <div class="sticky-container">
-        <svg class="svg-line-container" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <path id="path1" class="drawing-path" d="M 200 0 C 250 300, 750 200, 500 600 C 350 850, 700 800, 800 1000" />
-        </svg>
-        <div class="career-wrap">
-          <div class="career-node track-1-node" id="node1">
-            <h2 class="text-phrase">사람과</h2>
-            <div class="image-placeholder" style="background-image: url('./img/십이점오단체.jpeg');"></div>
+        <div class="ticket-divider"></div>
+        <div class="ticket-signature">
+          <h3>서명 후 입장해주세요.</h3>
+          <div class="sig-pad-wrapper">
+            <canvas class="signature-pad" id="sigPad"></canvas>
+          </div>
+          <div class="sig-buttons">
+            <button class="btn btn-clear" id="clearBtn">다시 쓰기</button>
+            <button class="btn btn-enter" id="enterBtn">
+              티켓 활성화 및 입장
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="scroll-pin-track" id="track2">
-      <div class="sticky-container">
-        <svg class="svg-line-container" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <path id="path2" class="drawing-path" d="M 800 0 C 850 300, 150 200, 300 600 C 400 850, 450 900, 500 1000" />
-        </svg>
-        <div class="career-wrap">
-          <div class="career-node track-2-node" id="node2">
-            <h2 class="text-phrase">디자인을</h2>
-            <div class="image-placeholder" style="background-image: url('./img/졸전.jpeg');"></div>
+    <header class="header">
+      <div class="logo">
+        <img src="./img/logo.png" alt="KONHO" />
+      </div>
+      <ul class="nav-links">
+        <li id="navPortfolio">작품소개</li>
+        <li class="sns-menu">
+          SNS
+          <div class="sns-dropdown">
+            <a href="https://www.behance.net/2e19a3ff" target="_blank"
+              >Behance</a
+            >
+            <a href="https://www.instagram.com/konho___/" target="_blank"
+              >Instagram</a
+            >
+          </div>
+        </li>
+      </ul>
+    </header>
+
+    <div class="global-close-btn" id="globalCloseBtn">✕</div>
+
+    <main class="portfolio-section" id="portfolioSection">
+      <div class="piano-item left-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/포스터썸.png&quot;);
+            background-color: #222;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>2024 ~ 2025 Poster Design</h2>
+            <p>Poster Design</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/포스터비.png" alt="온결고등학교 이미지" />
+        </div>
+      </div>
+
+      <div class="piano-item left-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/십이점오썸.png&quot;);
+            background-color: #333;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>12.5</h2>
+            <p>Branding & Clothing design</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/십이점오비.png" alt="십이점오 이미지" />
+        </div>
+      </div>
+
+      <div class="piano-item left-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/담다썸.png&quot;);
+            background-color: #444;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>담다</h2>
+            <p>Branding</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/담다비.png" alt="포스터 디자인" />
+        </div>
+      </div>
+
+      <div class="piano-item right-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/온결썸.png&quot;);
+            background-color: #111;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>온결고등학교</h2>
+            <p>Branding</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/온결고등학교비핸스.png" alt="컬러 리브랜딩" />
+        </div>
+      </div>
+
+      <div class="piano-item right-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/한지썸.png&quot;);
+            background-color: #252;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>한지</h2>
+            <p>Branding & UI/UX Design</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/한지비.png" alt="한지이미지" />
+        </div>
+      </div>
+
+      <div class="piano-item right-curten">
+        <div
+          class="piano-cover"
+          style="
+            background-image: url(&quot;./img/트라이브썸.png&quot;);
+            background-color: #3e3;
+          "
+        >
+          <div class="mask"></div>
+          <div class="cover-content">
+            <h2>Thrive</h2>
+            <p>Club Rebranding</p>
+          </div>
+        </div>
+        <div class="behance-viewer">
+          <img src="./img/트라이브비.png" alt="트라이브 이미지" />
+        </div>
+      </div>
+    </main>
+
+    <section class="career-section">
+      <div class="scroll-pin-track" id="track1">
+        <div class="sticky-container">
+          <svg
+            class="svg-line-container"
+            viewBox="0 0 1000 1000"
+            preserveAspectRatio="none"
+          >
+            <path
+              id="path1"
+              class="drawing-path"
+              d="M 200 0 C 250 300, 750 200, 500 600 C 350 850, 700 800, 800 1000"
+            />
+          </svg>
+          <div class="career-wrap">
+            <div class="career-node track-1-node" id="node1">
+              <h2 class="text-phrase">사람과</h2>
+              <div
+                class="image-placeholder"
+                style="
+                  background-image: url(&quot;./img/십이점오단체.jpeg&quot;);
+                "
+              ></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="scroll-pin-track large" id="track3">
-      <div class="sticky-container">
-        <svg class="svg-line-container" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <path id="path3" class="drawing-path" d="M 500 0 L 500 400" />
-        </svg>
-        <div class="career-wrap">
-          <div class="career-node track-3-node" id="node3">
-            <h2 class="text-phrase">이어주는 디자이너 강건호입니다.</h2>
-            <div class="career-box">
-              <div class="timeline">
-                <div class="timeline-item">
-                  <p class="time-period">2026 - PRESENT</p>
-                  <h3 class="job-title">Korea Polytechnic University (Seoul Jeongsu)</h3>
-                  <p class="job-desc">Visual Design 전공. UX/UI 디자인 리서치 방법론을 토대로 정밀한 사용자 동선 분석(User Journey Map) 및 최적화된 모바일 와이어프레임 설계 프로젝트 그룹 주도.</p>
-                </div>
-                <div class="timeline-item">
-                  <p class="time-period">2025 - 2026</p>
-                  <h3 class="job-title">Lotte Department Store</h3>
-                  <p class="job-desc">유통 플랫폼 현장 실무 근무. 대중의 시각적 흐름과 공간 VMD 레이아웃 최적화 경험을 축적하여 비즈니스 효율을 극대화하는 UX 인터페이스 안목 확립.</p>
+      <div class="scroll-pin-track" id="track2">
+        <div class="sticky-container">
+          <svg
+            class="svg-line-container"
+            viewBox="0 0 1000 1000"
+            preserveAspectRatio="none"
+          >
+            <path
+              id="path2"
+              class="drawing-path"
+              d="M 800 0 C 850 300, 150 200, 300 600 C 400 850, 450 900, 500 1000"
+            />
+          </svg>
+          <div class="career-wrap">
+            <div class="career-node track-2-node" id="node2">
+              <h2 class="text-phrase">디자인을</h2>
+              <div
+                class="image-placeholder"
+                style="background-image: url(&quot;./img/졸전.jpeg&quot;)"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-pin-track large" id="track3">
+        <div class="sticky-container">
+          <svg
+            class="svg-line-container"
+            viewBox="0 0 1000 1000"
+            preserveAspectRatio="none"
+          >
+            <path id="path3" class="drawing-path" d="M 500 0 L 500 200" />
+          </svg>
+          <div class="career-wrap">
+            <div class="career-node track-3-node" id="node3">
+              <h2 class="text-phrase">이어주는 디자이너 강건호입니다.</h2>
+              <div class="career-box">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <p class="time-period">2026 - PRESENT</p>
+                    <h3 class="job-title">
+                      한국 폴리텍대학교 서울정수캠퍼스 시각디자인과 재학
+                    </h3>
+                    <p class="job-desc">
+                      시각디자인 전공. <br> UI/UX와 HTML을 배우고,공모전 및 다른
+                      디자이너들과 함께 협업하여 디자인적 기획력을
+                      높이고있습니다.
+                    </p>
+                  </div>
+                  <div class="timeline-item">
+                    <p class="time-period">2023 - 2025</p>
+                    <h3 class="job-title">
+                      선린인터넷고등학교 콘텐츠디자인과 졸업
+                    </h3>
+                    <div class="job-desc">
+                      <ul class="activity-list">
+                        <li>
+                          <span class="act-year">2025</span>
+                          <span class="act-desc"
+                            >졸업전시회준비위원회 부위원장 및 메인디자이너
+                            총괄</span
+                          >
+                        </li>
+                        <li>
+                          <span class="act-year">2024</span>
+                          <span class="act-desc">학과발표회 부위원장</span>
+                        </li>
+                        <li>
+                          <span class="act-year">2024</span>
+                          <span class="act-desc"
+                            >소프트웨어나눔축제 메인디자이너</span
+                          >
+                        </li>
+                        <li>
+                          <span class="act-year">2024</span>
+                          <span class="act-desc">선린해커톤 메인디자이너</span>
+                        </li>
+                        <li>
+                          <span class="act-year">2024</span>
+                          <span class="act-desc"
+                            >디자인연구전공동아리 부장</span
+                          >
+                        </li>
+                        <li>
+                          <span class="act-year">2024</span>
+                          <span class="act-desc"
+                            >디자인창업자율동아리 개설 및 부장</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <script>
-    /* 1. 게이트 및 서명 매커니즘 */
-    const canvas = document.getElementById('sigPad');
-    const ctx = canvas.getContext('2d');
-    const clearBtn = document.getElementById('clearBtn');
-    const enterBtn = document.getElementById('enterBtn');
-    const gate = document.getElementById('ticketGate');
-    const portfolio = document.getElementById('portfolioSection');
+    <script>
+      document.getElementById("navPortfolio").addEventListener("click", () => {
+        const portfolio = document.getElementById("portfolioSection");
+        const headerHeight = document.querySelector(".header").offsetHeight;
 
-    let isDrawing = false;
-    ctx.strokeStyle = '#111111'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        const targetY =
+          portfolio.getBoundingClientRect().top + window.scrollY - headerHeight;
 
-    function getCoords(e) {
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); const c = getCoords(e); ctx.moveTo(c.x, c.y); });
-    canvas.addEventListener('mousemove', (e) => { if(!isDrawing) return; e.preventDefault(); const c = getCoords(e); ctx.lineTo(c.x, c.y); ctx.stroke(); });
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('touchstart', (e) => { isDrawing = true; ctx.beginPath(); const c = getCoords(e); ctx.moveTo(c.x, c.y); });
-    canvas.addEventListener('touchmove', (e) => { if(!isDrawing) return; e.preventDefault(); const c = getCoords(e); ctx.lineTo(c.x, c.y); ctx.stroke(); });
-    canvas.addEventListener('touchend', () => isDrawing = false);
-    clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
-
-    enterBtn.addEventListener('click', () => {
-      gate.classList.add('passed');
-      window.scrollTo(0, 0);
-      document.body.style.overflowY = 'auto'; 
-      setTimeout(() => { portfolio.classList.add('animate-in'); }, 300);
-    });
-
-    function fixCanvas() {
-      canvas.width = canvas.parentElement.clientWidth; canvas.height = 120;
-      ctx.strokeStyle = '#111111'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-    }
-    window.addEventListener('resize', fixCanvas);
-    fixCanvas();
-
-    /* 2. 🛠️ 피아노 건반 및 내부 비핸스 스크롤 상호작용 제어 */
-    const items = document.querySelectorAll('.piano-item');
-    let activeItem = null;
-
-    items.forEach(item => {
-      const closeBtn = item.querySelector('.close-btn');
-
-      // 건반 클릭하여 비핸스 뷰어 열기
-      item.addEventListener('click', (e) => {
-        if (item.classList.contains('active')) return; // 이미 열려있으면 동작 안함
-        if (e.target.classList.contains('close-btn')) return;
-
-        items.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        portfolio.classList.add('has-active');
-        activeItem = item;
-        
-        // 건반이 열렸을 때는 웹 메인 스크롤을 잠시 정지 (상세보기에 집중)
-        document.body.style.overflowY = 'hidden';
+        window.scrollTo({
+          top: targetY,
+          behavior: "smooth",
+        });
       });
 
-      // X 버튼 눌러서 닫기
-      closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 클릭 이벤트 버블링 방지
-        item.classList.remove('active');
-        portfolio.classList.remove('has-active');
-        item.scrollTo({ top: 0, behavior: 'smooth' }); // 상세 스크롤 최상단 리셋
-        activeItem = null;
-        
-        // 닫으면 웹 메인 스크롤 다시 개방
-        document.body.style.overflowY = 'auto';
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const introScreen = document.getElementById("introScreen");
+          introScreen.style.opacity = "0";
+          introScreen.style.visibility = "hidden";
+          document.getElementById("ticketElement").classList.add("show");
+        }, 2500);
       });
 
-      // 🛠️ 건반 내부 스크롤이 메인 전체 스크롤을 간섭하여 팅기지 않도록 휠 이벤트 격리화 락(Lock)
-      item.addEventListener('wheel', (e) => {
-        if (!item.classList.contains('active')) return;
-        
-        const scrollTop = item.scrollTop;
-        const scrollHeight = item.scrollHeight;
-        const clientHeight = item.clientHeight;
+      const canvas = document.getElementById("sigPad");
+      const ctx = canvas.getContext("2d");
+      const clearBtn = document.getElementById("clearBtn");
+      const enterBtn = document.getElementById("enterBtn");
+      const gate = document.getElementById("ticketGate");
+      const portfolio = document.getElementById("portfolioSection");
 
-        // 건반 내부 스크롤이 맨 위나 맨 아래에 도달했을 때 브라우저 스크롤이 전이되는 현상 차단
-        if ((e.deltaY < 0 && scrollTop <= 0) || (e.deltaY > 0 && scrollTop + clientHeight >= scrollHeight - 1)) {
-          e.preventDefault();
-        }
-      }, { passive: false });
-    });
+      let isDrawing = false;
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
 
-
-    /* 3. 하이엔드 둔화 감속 관성 인터폴레이션 연산 */
-    const paths = [document.getElementById('path1'), document.getElementById('path2'), document.getElementById('path3')];
-    const tracks = [document.getElementById('track1'), document.getElementById('track2'), document.getElementById('track3')];
-    const nodes = [document.getElementById('node1'), document.getElementById('node2'), document.getElementById('node3')];
-    
-    paths.forEach(path => {
-      const len = path.getTotalLength();
-      path.style.strokeDasharray = len + ' ' + len;
-      path.style.strokeDashoffset = len;
-    });
-
-    let smoothScrollY = window.scrollY;
-    const ease = 0.03; 
-
-    function renderScrollLoop() {
-      // 건반 상세보기가 열려있지 않을 때만 가상 감속 트래킹 작동
-      if (!activeItem) {
-        smoothScrollY += (window.scrollY - smoothScrollY) * ease;
+      function getCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
       }
-      
-      tracks.forEach((track, index) => {
-        const pathNode = paths[index];
-        const textNode = nodes[index];
-        const totalPathLength = pathNode.getTotalLength();
-
-        const trackRect = track.getBoundingClientRect();
-        const absoluteTrackTop = smoothScrollY + trackRect.top;
-        const trackHeight = track.clientHeight;
-
-        let trackProgress = (smoothScrollY - absoluteTrackTop) / (trackHeight - window.innerHeight);
-        if (trackProgress < 0) trackProgress = 0;
-        if (trackProgress > 1) trackProgress = 1;
-
-        pathNode.style.strokeDashoffset = totalPathLength - (totalPathLength * trackProgress);
-
-        if (trackProgress > 0.15 && trackProgress < 0.85) {
-          textNode.classList.add('visible');
-        } else {
-          if (index === 2 && trackProgress >= 0.15) {
-            textNode.classList.add('visible');
-          } else {
-            textNode.classList.remove('visible');
-          }
-        }
+      canvas.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        ctx.beginPath();
+        const c = getCoords(e);
+        ctx.moveTo(c.x, c.y);
       });
+      canvas.addEventListener("mousemove", (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const c = getCoords(e);
+        ctx.lineTo(c.x, c.y);
+        ctx.stroke();
+      });
+      canvas.addEventListener("mouseup", () => (isDrawing = false));
+      canvas.addEventListener("touchstart", (e) => {
+        isDrawing = true;
+        ctx.beginPath();
+        const c = getCoords(e);
+        ctx.moveTo(c.x, c.y);
+      });
+      canvas.addEventListener("touchmove", (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const c = getCoords(e);
+        ctx.lineTo(c.x, c.y);
+        ctx.stroke();
+      });
+      canvas.addEventListener("touchend", () => (isDrawing = false));
+      clearBtn.addEventListener("click", () =>
+        ctx.clearRect(0, 0, canvas.width, canvas.height),
+      );
+
+      enterBtn.addEventListener("click", () => {
+        gate.classList.add("passed");
+        window.scrollTo(0, 0);
+        document.body.style.overflowY = "auto";
+        setTimeout(() => {
+          portfolio.classList.add("animate-in");
+        }, 300);
+      });
+
+      function fixCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 120;
+        ctx.strokeStyle = "#111111";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+      }
+      window.addEventListener("resize", fixCanvas);
+      fixCanvas();
+
+      const items = document.querySelectorAll(".piano-item");
+      const globalCloseBtn = document.getElementById("globalCloseBtn");
+      let activeItem = null;
+
+      items.forEach((item) => {
+        item.addEventListener("click", (e) => {
+          if (item.classList.contains("active")) return;
+
+          items.forEach((i) => i.classList.remove("active"));
+          item.classList.add("active");
+          portfolio.classList.add("has-active");
+          activeItem = item;
+
+          document.body.style.overflowY = "hidden";
+
+          globalCloseBtn.classList.add("show");
+        });
+
+        item.addEventListener(
+          "wheel",
+          (e) => {
+            if (!item.classList.contains("active")) return;
+
+            const scrollTop = item.scrollTop;
+            const scrollHeight = item.scrollHeight;
+            const clientHeight = item.clientHeight;
+
+            if (
+              (e.deltaY < 0 && scrollTop <= 0) ||
+              (e.deltaY > 0 && scrollTop + clientHeight >= scrollHeight - 1)
+            ) {
+              e.preventDefault();
+            }
+          },
+          { passive: false },
+        );
+      });
+
+      globalCloseBtn.addEventListener("click", () => {
+        if (!activeItem) return;
+
+        activeItem.classList.remove("active");
+        portfolio.classList.remove("has-active");
+        activeItem.scrollTo({ top: 0, behavior: "smooth" });
+        activeItem = null;
+
+        document.body.style.overflowY = "auto";
+        globalCloseBtn.classList.remove("show");
+      });
+
+      const paths = [
+        document.getElementById("path1"),
+        document.getElementById("path2"),
+        document.getElementById("path3"),
+      ];
+      const tracks = [
+        document.getElementById("track1"),
+        document.getElementById("track2"),
+        document.getElementById("track3"),
+      ];
+      const nodes = [
+        document.getElementById("node1"),
+        document.getElementById("node2"),
+        document.getElementById("node3"),
+      ];
+
+      paths.forEach((path) => {
+        const len = path.getTotalLength();
+        path.style.strokeDasharray = len + " " + len;
+        path.style.strokeDashoffset = len;
+      });
+
+      let smoothScrollY = window.scrollY;
+      const ease = 0.03;
+
+      function renderScrollLoop() {
+        if (!activeItem) {
+          smoothScrollY += (window.scrollY - smoothScrollY) * ease;
+        }
+
+        tracks.forEach((track, index) => {
+          const pathNode = paths[index];
+          const textNode = nodes[index];
+          const totalPathLength = pathNode.getTotalLength();
+
+          const trackRect = track.getBoundingClientRect();
+          const absoluteTrackTop = smoothScrollY + trackRect.top;
+          const trackHeight = track.clientHeight;
+
+          let trackProgress =
+            (smoothScrollY - absoluteTrackTop) /
+            (trackHeight - window.innerHeight);
+          if (trackProgress < 0) trackProgress = 0;
+          if (trackProgress > 1) trackProgress = 1;
+
+          pathNode.style.strokeDashoffset =
+            totalPathLength - totalPathLength * trackProgress;
+
+          if (trackProgress > 0.15 && trackProgress < 0.85) {
+            textNode.classList.add("visible");
+          } else {
+            if (index === 2 && trackProgress >= 0.15) {
+              textNode.classList.add("visible");
+            } else {
+              textNode.classList.remove("visible");
+            }
+          }
+        });
+
+        requestAnimationFrame(renderScrollLoop);
+      }
 
       requestAnimationFrame(renderScrollLoop);
-    }
-
-    requestAnimationFrame(renderScrollLoop);
-  </script>
-</body>
+    </script>
+  </body>
 </html>
